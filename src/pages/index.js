@@ -1,33 +1,52 @@
 import React from "react";
+import g from "glamorous";
 import Link from "gatsby-link";
 
-export default () => 
-  <div style={{ color: `pink`, margin: '3rem auto', maxWidth: 600}}>
-    <h1>Hi! I'm building a fake Gatsby site as part of a tutorial!</h1>
+import { rhythm } from "../utils/typography";
+
+export default ({ data }) => {
+  console.log(data);
+  return (
     <div>
-      <p>From Richard Hamming’s classic and must-read talk, “<a href="http://www.cs.virginia.edu/~robins/YouAndYourResearch.html">
-            You and Your Research
-          </a>”.</p>
-      <img src="https://source.unsplash.com/random/400x200" alt="" />
-      <blockquote>
-        <p>
-          There is indeed an element of luck, and no, there isn’t. The prepared
-          mind sooner or later finds something important and does it. So yes, it
-          is luck.{" "}
-          <em>
-            The particular thing you do is luck, but that you do something is
-            not.
-          </em>
-        </p>
-      </blockquote>
-      <p>Posted April 09, 2011</p>
+      <g.H1 display={"inline-block"} borderBottom={"1px solid"}>
+        Amazing Pandas Eating Things
+      </g.H1>
+      <h4>{data.allMarkdownRemark.totalCount} Posts</h4>
+      {data.allMarkdownRemark.edges.map(({ node }) => (
+        <div key={node.id}>
+          <Link
+            to={node.fields.slug}
+            css={{ textDecoration: `none`, color: `inherit` }}
+          >
+            <g.H3 marginBottom={rhythm(1 / 4)}>
+              {node.frontmatter.title}{" "}
+              <g.Span color="#BBB">— {node.frontmatter.date}</g.Span>
+            </g.H3>
+          </Link>
+          <p>{node.excerpt}</p>
+        </div>
+      ))}
     </div>
-    <br />
-    <div>
-      <Link to="/page-2/">Link</Link>
-      <Link to="/page-3/">Link 3</Link>
-    </div>
-    <div>
-      <Link to="/counter/">Counter</Link>
-    </div>
-  </div>
+  );
+};
+
+export const query = graphql`
+  query IndexQuery {
+    allMarkdownRemark(sort: {fields: [frontmatter___date], order: DESC}) {
+      totalCount
+      edges {
+        node {
+          id
+          frontmatter {
+            title
+            date(formatString: "DD MMMM, YYYY")
+          }
+          fields {
+            slug
+          }
+          excerpt
+        }
+      }
+    }
+  }
+`;
